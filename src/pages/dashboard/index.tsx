@@ -2,6 +2,7 @@ import { getProductsForUserByUserName } from '@/firebase/services';
 import { useEffect, useState } from 'react';
 import type { DocumentData } from 'firebase/firestore';
 import Edit from './edit';
+import Modal from '@/components/Modal';
 
 const Dashboard: React.FC = () => {
 	const userName: string = 'codingbbq@gmail.com';
@@ -115,13 +116,9 @@ const Dashboard: React.FC = () => {
 				</table>
 			</div>
 
-			{isEditModalOpen && selectedProduct && (
-				<div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50'>
-					<div className='relative w-full max-w-2xl'>
-						<Edit product={selectedProduct} onClose={handleCloseModal} />
-					</div>
-				</div>
-			)}
+			<Modal title='Edit Product' isOpen={isEditModalOpen} onClose={handleCloseModal}>
+				<Edit product={selectedProduct} />
+			</Modal>
 		</section>
 	);
 };
