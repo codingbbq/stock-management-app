@@ -2,13 +2,13 @@ import { getAllProducts } from '@/firebase/services';
 import { DocumentData } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import Modal from '../Modal';
-import Edit from '@/pages/dashboard/edit';
+import Edit from '@/components/Products/edit';
 
-const AllProducts = () => {
+const AllProducts = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
 	const [products, setProducts] = useState<DocumentData[]>([]);
 	const [loading, setLoading] = useState(true);
 
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 	const [selectedProduct, setSelectedProduct] = useState({}); // State for the selected product
 
 	const handleEditClick = (product: DocumentData) => {
@@ -16,7 +16,7 @@ const AllProducts = () => {
 		setIsEditModalOpen(true); // Open the modal
 	};
 
-    const handleCloseModal = () => {
+	const handleCloseModal = () => {
 		setIsEditModalOpen(false); // Close the modal
 		setSelectedProduct({}); // Clear the selected product
 	};
@@ -36,17 +36,17 @@ const AllProducts = () => {
 		fetchProducts();
 	}, []);
 
-    // Show Readable Date Format
-    const formatDate = (timestamp: number) => {
-        const date = new Date(timestamp * 1000);
-        return date.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-        });
-    }
+	// Show Readable Date Format
+	const formatDate = (timestamp: number) => {
+		const date = new Date(timestamp * 1000);
+		return date.toLocaleDateString('en-US', {
+			year: 'numeric',
+			month: 'long',
+			day: 'numeric',
+			hour: '2-digit',
+			minute: '2-digit',
+		});
+	};
 
 	if (loading) {
 		return <p>Loading products...</p>;
@@ -87,12 +87,14 @@ const AllProducts = () => {
 						>
 							Updated At
 						</th>
-						<th
-							scope='col'
-							className='px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider'
-						>
-							<span className='sr-only'>Actions</span>
-						</th>
+						{isLoggedIn && (
+							<th
+								scope='col'
+								className='px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider'
+							>
+								<span className='sr-only'>Actions</span>
+							</th>
+						)}
 					</tr>
 				</thead>
 				<tbody>
@@ -115,7 +117,11 @@ const AllProducts = () => {
 							</td>
 							<td className='px-6 py-4'>{product.name}</td>
 							<td className='px-6 py-4'>{product.quantity}</td>
-							<td className='px-6 py-4'>{formatDate(product.updatedAt.seconds)} {/* Convert seconds to readable date */}</td>
+							<td className='px-6 py-4'>
+								{formatDate(product.updatedAt.seconds)}{' '}
+								{/* Convert seconds to readable date */}
+							</td>
+                            { isLoggedIn && (
 							<td className='px-6 py-4 text-right'>
 								<a
 									href='#'
@@ -128,12 +134,13 @@ const AllProducts = () => {
 									Edit
 								</a>
 							</td>
+                            )}
 						</tr>
 					))}
 				</tbody>
 			</table>
 
-            <Modal title='Edit Product' isOpen={isEditModalOpen} onClose={handleCloseModal}>
+			<Modal title='Edit Product' isOpen={isEditModalOpen} onClose={handleCloseModal}>
 				<Edit product={selectedProduct} />
 			</Modal>
 		</div>

@@ -26,14 +26,6 @@ const Navigation: React.FC = () => {
 												Log In
 											</Link>
 										</li>
-                                        <li>
-											<Link
-												className='hover:text-sky-500 dark:hover:text-sky-400'
-												to='/dashboard'
-											>
-												Dashboard
-											</Link>
-										</li>
 									</ul>
 								</nav>
 
