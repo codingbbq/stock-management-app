@@ -1,4 +1,4 @@
-import { getAllProducts } from '@/firebase/services';
+import { getAllProducts } from '@/service/product';
 import { DocumentData } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import Modal from '../Modal';
