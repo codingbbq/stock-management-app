@@ -1,18 +1,19 @@
 import { useAuth } from '@/lib/AuthContext';
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Login: React.FC = () => {
 	const { login } = useAuth();
 	const [username, setUsername] = useState('');
 	const [password, setPassword] = useState('');
 	const [error, setError] = useState('');
+    const navigate = useNavigate();
 
 	const handleLogin = async (e: React.FormEvent) => {
 		e.preventDefault();
 		try {
 			await login(username, password);
-            // After user is successfully logged in update the context and redirect user to landing page
-            window.location.href = '/'; // Redirect to home page after login
+            navigate('/', { replace: true }); // Redirect to home after successful login
 		
 		} catch (err) {
 			setError('Invalid username or password');

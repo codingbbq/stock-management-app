@@ -3,8 +3,11 @@ import { DocumentData } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import Modal from '../Modal';
 import Edit from '@/components/Products/edit';
+import { useAuth } from '@/lib/AuthContext';
 
-const AllProducts = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
+const AllProducts = () => {
+    const { isLoggedIn } = useAuth();
+    
 	const [products, setProducts] = useState<DocumentData[]>([]);
 	const [loading, setLoading] = useState(true);
 
