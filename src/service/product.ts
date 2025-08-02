@@ -1,4 +1,4 @@
-import { collection, doc, getDocs, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, getDocs, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 
 // Function to get all products
@@ -10,7 +10,7 @@ export const getAllProducts = async () => {
 			id: doc.id, // Include the document ID
 			...doc.data(), // Spread the document data
 		}));
-    console.log('Fetched products:', productsList);
+		console.log('Fetched products:', productsList);
 		return productsList;
 	} catch (error) {
 		console.error('Error fetching all products:', error);
@@ -26,21 +26,33 @@ export const updateProduct = async (productId: string, updatedData: any) => {
 			name: updatedData.name,
 			quantity: updatedData.quantity,
 			updatedAt: new Date().getTime(), // Update the timestamp to current time
-		  });
+		});
 		console.log(`Product ${productId} updated successfully.`);
 	} catch (error) {
 		console.error('Error updating product:', error);
 		throw error;
 	}
-}
+};
 
-export const updateProductHistory = async (productId: string, historyData: any) => {
+export const addProductHistory = async (
+	productId: string,
+	historyData: {
+		action: string;
+		quantity: number;
+		comment: string;
+		timestamp: Date;
+	}
+) => {
 	try {
-		const historyRef = doc(collection(db, 'products', productId, 'history')); // Create a DocumentReference within the history subcollection
-		await updateDoc(historyRef, historyData);
-		console.log(`Product ${productId} history updated successfully.`);
+		// Reference to the history subcollection of the product
+		const historyRef = collection(db, 'products', productId, 'history');
+
+		// Add a new document to the history subcollection
+		await addDoc(historyRef, historyData);
+
+		console.log('Product history added successfully!');
 	} catch (error) {
-		console.error('Error updating product history:', error);
+		console.error('Error adding product history:', error);
 		throw error;
 	}
-}
+};

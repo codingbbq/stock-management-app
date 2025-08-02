@@ -1,4 +1,4 @@
-import { updateProduct, updateProductHistory } from '@/service/product';
+import { updateProduct, addProductHistory } from '@/service/product';
 import { DocumentData } from 'firebase/firestore';
 import { useState } from 'react';
 
@@ -49,6 +49,7 @@ const Edit = ({ product }: { product: DocumentData }) => {
 			action: '',
 			quantity: 0,
 			comment: comment || '',
+			timestamp: new Date(),
 		};
 		if(addQuantity > 0) {
 			history.action = "added";
@@ -58,7 +59,7 @@ const Edit = ({ product }: { product: DocumentData }) => {
 			history.quantity = removeQuantity;
 		}
 		
-		await updateProductHistory(product.id, history);
+		await addProductHistory(product.id, history);
 
 
 		// Reset form fields

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Modal from '../Modal';
 import Edit from '@/components/Products/edit';
 import { useAuth } from '@/lib/AuthContext';
+import History from './history';
 
 const AllProducts = () => {
 	const { isLoggedIn } = useAuth();
@@ -12,12 +13,18 @@ const AllProducts = () => {
 	const [loading, setLoading] = useState(true);
 
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
 	const [selectedProduct, setSelectedProduct] = useState({}); // State for the selected product
 
 	const handleEditClick = (product: DocumentData) => {
 		setSelectedProduct(product); // Set the selected product
 		setIsEditModalOpen(true); // Open the modal
 	};
+
+    const handleViewHistory = (product: DocumentData) => {
+        setSelectedProduct(product); // Set the selected product
+        setIsHistoryModalOpen(true); // Open the history modal
+    };
 
 	const handleCloseModal = () => {
 		setIsEditModalOpen(false); // Close the modal
@@ -130,7 +137,7 @@ const AllProducts = () => {
 								<td className='px-6 py-4'>{product.name}</td>
 								<td className='px-6 py-4'>{product.quantity}</td>
 								<td className='px-6 py-4'>
-									{formatDate(product.updatedAt.seconds)}{' '}
+									{formatDate(product.updatedAt)}{' '}
 									{/* Convert seconds to readable date */}
 								</td>
 								{isLoggedIn && (
@@ -145,6 +152,17 @@ const AllProducts = () => {
 										>
 											Edit
 										</a>
+
+                                        <a
+											href='#'
+											onClick={(e) => {
+												e.preventDefault(); // Prevent default link behavior
+												handleViewHistory(product); // Open the modal
+											}}
+											className='font-medium text-blue-600 dark:text-blue-500 hover:underline'
+										>
+											History
+										</a>
 									</td>
 								)}
 							</tr>
@@ -154,6 +172,10 @@ const AllProducts = () => {
 
 				<Modal title='Edit Product' isOpen={isEditModalOpen} onClose={handleCloseModal}>
 					<Edit product={selectedProduct} />
+				</Modal>
+
+                <Modal title='View History' isOpen={isHistoryModalOpen} onClose={handleCloseModal}>
+					<History product={selectedProduct} />
 				</Modal>
 			</div>
 		</>
