@@ -42,7 +42,7 @@ const Edit = ({ product }: DocumentData ) => {
 			action: '',
 			quantity: 0,
 			comment: comment || '',
-			timestamp: new Date(),
+			timestamp: new Date().getTime(), // Current timestamp in milliseconds
 		};
 		if(addQuantity > 0) {
 			history.action = "added";

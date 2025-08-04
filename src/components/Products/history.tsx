@@ -94,10 +94,10 @@ const History = ({ product }: DocumentData) => {
 										{formatDate(record.timestamp)}
 									</td>
 									<td className='px-6 py-4 text-green-600 font-medium'>
-										{record.qtyAdded > 0 ? `+${record.qtyAdded}` : ''}
+										{record.qtyAdded > 0 ? `+${record.qtyAdded}` : 0}
 									</td>
 									<td className='px-6 py-4 text-red-600 font-medium'>
-										{record.qtyRemoved > 0 ? `-${record.qtyRemoved}` : ''}
+										{record.qtyRemoved > 0 ? `-${record.qtyRemoved}` : 0}
 									</td>
 									<td className='px-6 py-4'>{record.comment || 'N/A'}</td>
 								</tr>

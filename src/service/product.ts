@@ -34,13 +34,35 @@ export const updateProduct = async (productId: string, updatedData: any) => {
 	}
 };
 
+export const addProduct = async (productData: {
+	img: string; // URL or base64 string of the product image
+	product_code: string;
+	name: string;
+	quantity: number;
+	updatedAt: number; // Timestamp in milliseconds
+  }) => {
+	try {
+	  // Reference to the `products` collection
+	  const productsRef = collection(db, "products");
+  
+	  // Add the product to the collection
+	  const docRef = await addDoc(productsRef, productData);
+  
+	  console.log(`Product added successfully with ID: ${docRef.id}`);
+	  return docRef.id; // Return the document ID of the newly added product
+	} catch (error) {
+	  console.error("Error adding product:", error);
+	  throw error; // Rethrow the error for further handling
+	}
+  };
+
 export const addProductHistory = async (
 	productId: string,
 	historyData: {
 		action: string;
 		quantity: number;
 		comment: string;
-		timestamp: Date;
+		timestamp: number;
 	}
 ) => {
 	try {

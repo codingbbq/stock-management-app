@@ -6,6 +6,7 @@ import Edit from '@/components/Products/edit';
 import { useAuth } from '@/lib/AuthContext';
 import History from './history';
 import { formatDate } from '@/helper/formatdata';
+import AddProduct from './add';
 
 const AllProducts = () => {
 	const { isLoggedIn } = useAuth();
@@ -14,22 +15,28 @@ const AllProducts = () => {
 	const [loading, setLoading] = useState(true);
 
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
-    const [selectedProduct, setSelectedProduct] = useState<DocumentData | null>(null);
+	const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+	const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+	const [selectedProduct, setSelectedProduct] = useState<DocumentData | null>(null);
 
 	const handleEditClick = (product: DocumentData) => {
 		setSelectedProduct(product); // Set the selected product
 		setIsEditModalOpen(true); // Open the modal
 	};
 
-    const handleViewHistory = (product: DocumentData) => {
-        setSelectedProduct(product); // Set the selected product
-        setIsHistoryModalOpen(true); // Open the history modal
-    };
+	const handleViewHistory = (product: DocumentData) => {
+		setSelectedProduct(product); // Set the selected product
+		setIsHistoryModalOpen(true); // Open the history modal
+	};
+
+	const handleAddProduct = () => {
+		setIsAddModalOpen(true); // Open the modal for adding a new product
+	};
 
 	const handleCloseModal = () => {
 		setIsEditModalOpen(false); // Close the modal
-        setIsHistoryModalOpen(false); // Close the history modal
+		setIsHistoryModalOpen(false); // Close the history modal
+        setIsAddModalOpen(false); // Close the add product modal
 		setSelectedProduct(null); // Clear the selected product
 	};
 
@@ -58,6 +65,7 @@ const AllProducts = () => {
 				<button
 					type='button'
 					className='text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
+					onClick={handleAddProduct}
 				>
 					Add Product
 				</button>
@@ -126,9 +134,7 @@ const AllProducts = () => {
 								</td>
 								<td className='px-6 py-4'>{product.name}</td>
 								<td className='px-6 py-4'>{product.quantity}</td>
-								<td className='px-6 py-4'>
-									{formatDate(product.updatedAt)}
-								</td>
+								<td className='px-6 py-4'>{formatDate(product.updatedAt)}</td>
 								{isLoggedIn && (
 									<td className='px-6 py-4 text-right'>
 										<a
@@ -142,7 +148,7 @@ const AllProducts = () => {
 											Edit
 										</a>
 
-                                        <a
+										<a
 											href='#'
 											onClick={(e) => {
 												e.preventDefault(); // Prevent default link behavior
@@ -163,8 +169,16 @@ const AllProducts = () => {
 					<Edit product={selectedProduct} />
 				</Modal>
 
-                <Modal title={selectedProduct?.name} isOpen={isHistoryModalOpen} onClose={handleCloseModal}>
+				<Modal
+					title={selectedProduct?.name}
+					isOpen={isHistoryModalOpen}
+					onClose={handleCloseModal}
+				>
 					<History product={selectedProduct} />
+				</Modal>
+
+				<Modal title='Add Product' isOpen={isAddModalOpen} onClose={handleCloseModal}>
+					<AddProduct />
 				</Modal>
 			</div>
 		</>
