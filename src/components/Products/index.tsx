@@ -5,6 +5,7 @@ import Modal from '../Modal';
 import Edit from '@/components/Products/edit';
 import { useAuth } from '@/lib/AuthContext';
 import History from './history';
+import { formatDate } from '@/helper/formatdata';
 
 const AllProducts = () => {
 	const { isLoggedIn } = useAuth();
@@ -45,18 +46,6 @@ const AllProducts = () => {
 
 		fetchProducts();
 	}, []);
-
-	// Show Readable Date Format
-	const formatDate = (timestamp: number) => {
-		const date = new Date(timestamp * 1000);
-		return date.toLocaleDateString('en-US', {
-			year: 'numeric',
-			month: 'long',
-			day: 'numeric',
-			hour: '2-digit',
-			minute: '2-digit',
-		});
-	};
 
 	if (loading) {
 		return <p>Loading products...</p>;
@@ -137,8 +126,7 @@ const AllProducts = () => {
 								<td className='px-6 py-4'>{product.name}</td>
 								<td className='px-6 py-4'>{product.quantity}</td>
 								<td className='px-6 py-4'>
-									{formatDate(product.updatedAt)}{' '}
-									{/* Convert seconds to readable date */}
+									{formatDate(product.updatedAt)}
 								</td>
 								{isLoggedIn && (
 									<td className='px-6 py-4 text-right'>
@@ -148,7 +136,7 @@ const AllProducts = () => {
 												e.preventDefault(); // Prevent default link behavior
 												handleEditClick(product); // Open the modal
 											}}
-											className='font-medium text-blue-600 dark:text-blue-500 hover:underline'
+											className='mr-2 font-medium text-blue-600 dark:text-blue-500 hover:underline'
 										>
 											Edit
 										</a>

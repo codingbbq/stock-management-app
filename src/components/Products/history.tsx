@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { collection, getDocs, doc, getDoc, DocumentData } from 'firebase/firestore';
 import { db } from '@/firebase/config';
+import { formatDate } from '@/helper/formatdata';
 
 const History = ({ product }: DocumentData) => {
 	const [history, setHistory] = useState<any[]>([]);
@@ -11,7 +12,7 @@ const History = ({ product }: DocumentData) => {
 		const fetchHistory = async () => {
 			try {
 				// Fetch product details to get the current quantity
-				const productRef = doc(db, 'products', productId);
+				const productRef = doc(db, 'products', product.id);
 				const productSnapshot = await getDoc(productRef);
 				if (productSnapshot.exists()) {
 					const productData = productSnapshot.data();
@@ -19,15 +20,21 @@ const History = ({ product }: DocumentData) => {
 				}
 
 				// Fetch history subcollection
-				const historyRef = collection(db, 'products', productId, 'history');
+				const historyRef = collection(db, 'products', product.id, 'history');
 				const historySnapshot = await getDocs(historyRef);
-				const historyData = historySnapshot.docs.map((doc) => ({
-					id: doc.id,
-					...doc.data(),
-				}));
+				const historyData = historySnapshot.docs.map((doc) => {
+					const data = doc.data();
+                    console.log(data);
+					return {
+						id: doc.id,
+						...data,
+						qtyAdded: data.action === 'added' ? data.quantity || 0 : 0, // Set qtyAdded if action is "added"
+						qtyRemoved: data.action === 'removed' ? data.quantity || 0 : 0, // Set qtyRemoved if action is "removed"
+					};
+				});
 
 				// Sort history by timestamp (most recent first)
-				historyData.sort((a, b) => b.timestamp.toMillis() - a.timestamp.toMillis());
+				// historyData.sort((a, b) => b.timestamp.toMillis() - a.timestamp.toMillis());
 
 				setHistory(historyData);
 			} catch (error) {
@@ -38,7 +45,7 @@ const History = ({ product }: DocumentData) => {
 		};
 
 		fetchHistory();
-	}, [productId]);
+	}, [product.id]);
 
 	if (loading) {
 		return <p className='text-center text-gray-500'>Loading history...</p>;
@@ -72,13 +79,13 @@ const History = ({ product }: DocumentData) => {
 								className='bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600'
 							>
 								<td className='px-6 py-4'>
-									{new Date(record.timestamp.toMillis()).toLocaleString()}
+									{formatDate(record.timestamp)}
 								</td>
 								<td className='px-6 py-4 text-green-600 font-medium'>
-									{record.added_quantity || 0}
+									{record.qtyAdded || 0}
 								</td>
 								<td className='px-6 py-4 text-red-600 font-medium'>
-									{record.removed_quantity || 0}
+									{record.qtyRemoved || 0}
 								</td>
 								<td className='px-6 py-4'>{record.comment || 'N/A'}</td>
 							</tr>
