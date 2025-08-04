@@ -24,7 +24,7 @@ const History = ({ product }: DocumentData) => {
 				const historySnapshot = await getDocs(historyRef);
 				const historyData = historySnapshot.docs.map((doc) => {
 					const data = doc.data();
-                    console.log(data);
+					console.log(data);
 					return {
 						id: doc.id,
 						...data,
@@ -53,45 +53,58 @@ const History = ({ product }: DocumentData) => {
 
 	return (
 		<div className='container mx-auto p-6 max-w-4xl'>
-			<h1 className='text-2xl font-bold mb-4 text-gray-800'>Product History</h1>
-			<div className='relative overflow-x-auto shadow-md sm:rounded-lg'>
-				<table className='w-full text-sm text-left text-gray-500 dark:text-gray-400'>
-					<thead className='text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400'>
-						<tr>
-							<th scope='col' className='px-6 py-3'>
-								Date
-							</th>
-							<th scope='col' className='px-6 py-3'>
-								Added Quantity
-							</th>
-							<th scope='col' className='px-6 py-3'>
-								Removed Quantity
-							</th>
-							<th scope='col' className='px-6 py-3'>
-								Comment
-							</th>
-						</tr>
-					</thead>
-					<tbody>
-						{history.map((record) => (
-							<tr
-								key={record.id}
-								className='bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600'
-							>
-								<td className='px-6 py-4'>
-									{formatDate(record.timestamp)}
-								</td>
-								<td className='px-6 py-4 text-green-600 font-medium'>
-									{record.qtyAdded || 0}
-								</td>
-								<td className='px-6 py-4 text-red-600 font-medium'>
-									{record.qtyRemoved || 0}
-								</td>
-								<td className='px-6 py-4'>{record.comment || 'N/A'}</td>
+			<div className='relative overflow-hidden shadow-md sm:rounded-lg'>
+				<div className='h-[350px] overflow-y-auto'>
+					<table className='w-full text-sm text-left text-gray-500 dark:text-gray-400'>
+						<thead className='text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400'>
+							<tr>
+								<th
+									scope='col'
+									className='px-6 py-3 sticky top-0 bg-gray-50 dark:bg-gray-700'
+								>
+									Date
+								</th>
+								<th
+									scope='col'
+									className='px-6 py-3 sticky top-0 bg-gray-50 dark:bg-gray-700'
+								>
+									Added Quantity
+								</th>
+								<th
+									scope='col'
+									className='px-6 py-3 sticky top-0 bg-gray-50 dark:bg-gray-700'
+								>
+									Removed Quantity
+								</th>
+								<th
+									scope='col'
+									className='px-6 py-3 sticky top-0 bg-gray-50 dark:bg-gray-700'
+								>
+									Comment
+								</th>
 							</tr>
-						))}
-					</tbody>
-				</table>
+						</thead>
+						<tbody>
+							{history.map((record) => (
+								<tr
+									key={record.id}
+									className='bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600'
+								>
+									<td className='px-6 py-4'>
+										{formatDate(record.timestamp)}
+									</td>
+									<td className='px-6 py-4 text-green-600 font-medium'>
+										{record.qtyAdded > 0 ? `+${record.qtyAdded}` : ''}
+									</td>
+									<td className='px-6 py-4 text-red-600 font-medium'>
+										{record.qtyRemoved > 0 ? `-${record.qtyRemoved}` : ''}
+									</td>
+									<td className='px-6 py-4'>{record.comment || 'N/A'}</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</div>
 			</div>
 			<div className='mt-6'>
 				<h2 className='text-lg font-semibold text-gray-800'>

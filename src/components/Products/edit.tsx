@@ -2,7 +2,7 @@ import { updateProduct, addProductHistory } from '@/service/product';
 import { DocumentData } from 'firebase/firestore';
 import { useState } from 'react';
 
-const Edit = ({ product }: { product: DocumentData }) => {
+const Edit = ({ product }: DocumentData ) => {
 	console.log('Editing product:', product);
 	const [img, setImg] = useState(product.img || '');
 	const [code, setCode] = useState(product.product_code || '');
@@ -31,13 +31,6 @@ const Edit = ({ product }: { product: DocumentData }) => {
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		const updatedQuantity = quantity + addQuantity - removeQuantity;
-
-		console.log({
-			product_code: code,
-			product_name: name,
-			updated_quantity: updatedQuantity,
-			comment,
-		});
 
 		await updateProduct(product.id, {
 			code,

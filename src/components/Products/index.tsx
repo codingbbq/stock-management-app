@@ -15,7 +15,7 @@ const AllProducts = () => {
 
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
-	const [selectedProduct, setSelectedProduct] = useState({}); // State for the selected product
+    const [selectedProduct, setSelectedProduct] = useState<DocumentData | null>(null);
 
 	const handleEditClick = (product: DocumentData) => {
 		setSelectedProduct(product); // Set the selected product
@@ -29,7 +29,8 @@ const AllProducts = () => {
 
 	const handleCloseModal = () => {
 		setIsEditModalOpen(false); // Close the modal
-		setSelectedProduct({}); // Clear the selected product
+        setIsHistoryModalOpen(false); // Close the history modal
+		setSelectedProduct(null); // Clear the selected product
 	};
 
 	useEffect(() => {
@@ -162,7 +163,7 @@ const AllProducts = () => {
 					<Edit product={selectedProduct} />
 				</Modal>
 
-                <Modal title='View History' isOpen={isHistoryModalOpen} onClose={handleCloseModal}>
+                <Modal title={selectedProduct?.name} isOpen={isHistoryModalOpen} onClose={handleCloseModal}>
 					<History product={selectedProduct} />
 				</Modal>
 			</div>
