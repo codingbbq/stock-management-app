@@ -41,18 +41,23 @@ const AllProducts = () => {
 		setSelectedProduct(null); // Clear the selected product
 	};
 
-	useEffect(() => {
-		const fetchProducts = async () => {
-			await withLoader("Fetching Product", async () => {
-				try {
-					const productsList = await getAllProducts();
-					setProducts(productsList);
-				} catch (error) {
-					console.error('Error fetching products:', error);
-				}
-			});
-		};
+	const handleOnSuccess = () => {
+		handleCloseModal(); // Close the modal after successful operation
+		fetchProducts(); // Refresh the product list
+	};
 
+	const fetchProducts = async () => {
+		await withLoader('Fetching Product', async () => {
+			try {
+				const productsList = await getAllProducts();
+				setProducts(productsList);
+			} catch (error) {
+				console.error('Error fetching products:', error);
+			}
+		});
+	};
+
+	useEffect(() => {
 		fetchProducts();
 	}, []);
 
@@ -175,7 +180,7 @@ const AllProducts = () => {
 				</Modal>
 
 				<Modal title='Add Product' isOpen={isAddModalOpen} onClose={handleCloseModal}>
-					<AddProduct />
+					<AddProduct onSuccess={handleOnSuccess} />
 				</Modal>
 			</div>
 		</>

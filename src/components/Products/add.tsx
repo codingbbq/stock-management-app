@@ -4,7 +4,7 @@ import { uploadImageToFirebase } from '@/service/uploadImage';
 import { useWithLoader } from '@/helper/withLoader';
 import imageCompression from 'browser-image-compression';
 
-const AddProductForm: React.FC = () => {
+const AddProductForm: React.FC<{ onSuccess?: () => void }> = ({ onSuccess }) => {
 	const [productCode, setProductCode] = useState('');
 	const [productName, setProductName] = useState('');
 	const [productImage, setProductImage] = useState<File | null>(null);
@@ -24,7 +24,6 @@ const AddProductForm: React.FC = () => {
 			};
 			try {
 				const compressedFile = await imageCompression(file, options);
-				
 				setProductImage(compressedFile);
 			} catch (error) {
 				console.error('Error compressing image:', error);
@@ -36,7 +35,7 @@ const AddProductForm: React.FC = () => {
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
-		await withLoader("Adding product", async () => {
+		await withLoader('Adding product', async () => {
 			try {
 				let imgURL = '';
 				if (productImage) {
@@ -72,6 +71,10 @@ const AddProductForm: React.FC = () => {
 				setProductName('');
 				setProductImage(null);
 				setInitialQuantity(0);
+
+				if (onSuccess) {
+					onSuccess(); // Call the onSuccess callback if provided
+				}
 			} catch (err) {
 				setError('Error adding product. Please try again.');
 				setSuccess('');
