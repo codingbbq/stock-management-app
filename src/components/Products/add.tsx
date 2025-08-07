@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { addProduct, addProductHistory } from '@/service/product';
 import { uploadImageToFirebase } from '@/service/uploadImage';
 import { useWithLoader } from '@/helper/withLoader';
+import imageCompression from 'browser-image-compression';
 
 const AddProductForm: React.FC = () => {
 	const [productCode, setProductCode] = useState('');
@@ -12,9 +13,23 @@ const AddProductForm: React.FC = () => {
 	const [success, setSuccess] = useState('');
 	const withLoader = useWithLoader();
 
-	const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files && e.target.files[0]) {
-			setProductImage(e.target.files[0]);
+			const file = e.target.files[0];
+			// Compress the image before uploading
+			const options = {
+				maxSizeMB: 0.5, // Maximum size in MB
+				maxWidthOrHeight: 1024, // Maximum width or height in pixels
+				useWebWorker: true, // Use web worker for compression
+			};
+			try {
+				const compressedFile = await imageCompression(file, options);
+				
+				setProductImage(compressedFile);
+			} catch (error) {
+				console.error('Error compressing image:', error);
+				setProductImage(file); // Fallback to original file if compression fails
+			}
 		}
 	};
 
