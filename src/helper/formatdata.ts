@@ -1,7 +1,6 @@
 // Show Readable Date Format
 export const formatDate = (timestamp: number) => {
     const date = new Date(timestamp);
-    console.log(date);
     return date.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',

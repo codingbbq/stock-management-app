@@ -1,8 +1,9 @@
 import { updateProduct, addProductHistory } from '@/service/product';
 import { DocumentData } from 'firebase/firestore';
 import { useState } from 'react';
+import { useWithLoader } from '@/helper/withLoader'; // Adjust the import path as necessary
 
-const Edit = ({ product }: DocumentData ) => {
+const Edit = ({ product }: DocumentData) => {
 	console.log('Editing product:', product);
 	const [img, setImg] = useState(product.img || '');
 	const [code, setCode] = useState(product.product_code || '');
@@ -11,6 +12,8 @@ const Edit = ({ product }: DocumentData ) => {
 	const [addQuantity, setAddQuantity] = useState(0);
 	const [removeQuantity, setRemoveQuantity] = useState(0);
 	const [comment, setComment] = useState('');
+
+	const withLoader = useWithLoader();
 
 	const handleAddQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = Number(e.target.value);
@@ -29,36 +32,37 @@ const Edit = ({ product }: DocumentData ) => {
 	};
 
 	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		const updatedQuantity = quantity + addQuantity - removeQuantity;
+		await withLoader("Editing product", async () => {
+			e.preventDefault();
+			const updatedQuantity = quantity + addQuantity - removeQuantity;
 
-		await updateProduct(product.id, {
-			code,
-			name,
-			quantity: updatedQuantity,
+			await updateProduct(product.id, {
+				code,
+				name,
+				quantity: updatedQuantity,
+			});
+
+			let history = {
+				action: '',
+				quantity: 0,
+				comment: comment || '',
+				timestamp: new Date().getTime(), // Current timestamp in milliseconds
+			};
+			if (addQuantity > 0) {
+				history.action = 'added';
+				history.quantity = addQuantity;
+			} else if (removeQuantity > 0) {
+				history.action = 'removed';
+				history.quantity = removeQuantity;
+			}
+
+			await addProductHistory(product.id, history);
+
+			// Reset form fields
+			setAddQuantity(0);
+			setRemoveQuantity(0);
+			setComment('');
 		});
-
-		let history = {
-			action: '',
-			quantity: 0,
-			comment: comment || '',
-			timestamp: new Date().getTime(), // Current timestamp in milliseconds
-		};
-		if(addQuantity > 0) {
-			history.action = "added";
-			history.quantity = addQuantity;
-		} else if(removeQuantity > 0) {
-			history.action = "removed";
-			history.quantity = removeQuantity;
-		}
-		
-		await addProductHistory(product.id, history);
-
-
-		// Reset form fields
-		setAddQuantity(0);
-		setRemoveQuantity(0);
-		setComment('');
 	};
 
 	return (

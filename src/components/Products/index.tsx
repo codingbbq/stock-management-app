@@ -7,17 +7,18 @@ import { useAuth } from '@/lib/AuthContext';
 import History from './history';
 import { formatDate } from '@/helper/formatdata';
 import AddProduct from './add';
+import { useWithLoader } from '@/helper/withLoader';
 
 const AllProducts = () => {
 	const { isLoggedIn } = useAuth();
 
 	const [products, setProducts] = useState<DocumentData[]>([]);
-	const [loading, setLoading] = useState(true);
 
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 	const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
 	const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 	const [selectedProduct, setSelectedProduct] = useState<DocumentData | null>(null);
+	const withLoader = useWithLoader();
 
 	const handleEditClick = (product: DocumentData) => {
 		setSelectedProduct(product); // Set the selected product
@@ -36,28 +37,24 @@ const AllProducts = () => {
 	const handleCloseModal = () => {
 		setIsEditModalOpen(false); // Close the modal
 		setIsHistoryModalOpen(false); // Close the history modal
-        setIsAddModalOpen(false); // Close the add product modal
+		setIsAddModalOpen(false); // Close the add product modal
 		setSelectedProduct(null); // Clear the selected product
 	};
 
 	useEffect(() => {
 		const fetchProducts = async () => {
-			try {
-				const productsList = await getAllProducts();
-				setProducts(productsList);
-			} catch (error) {
-				console.error('Error fetching products:', error);
-			} finally {
-				setLoading(false);
-			}
+			await withLoader("Fetching Product", async () => {
+				try {
+					const productsList = await getAllProducts();
+					setProducts(productsList);
+				} catch (error) {
+					console.error('Error fetching products:', error);
+				}
+			});
 		};
 
 		fetchProducts();
 	}, []);
-
-	if (loading) {
-		return <p>Loading products...</p>;
-	}
 
 	return (
 		<>

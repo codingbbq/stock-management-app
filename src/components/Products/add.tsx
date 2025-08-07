@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { addProduct, addProductHistory } from '@/service/product';
 import { uploadImageToFirebase } from '@/service/uploadImage';
+import { useWithLoader } from '@/helper/withLoader';
 
 const AddProductForm: React.FC = () => {
 	const [productCode, setProductCode] = useState('');
@@ -9,6 +10,7 @@ const AddProductForm: React.FC = () => {
 	const [initialQuantity, setInitialQuantity] = useState<number>(0);
 	const [error, setError] = useState('');
 	const [success, setSuccess] = useState('');
+	const withLoader = useWithLoader();
 
 	const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files && e.target.files[0]) {
@@ -19,45 +21,47 @@ const AddProductForm: React.FC = () => {
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
-		try {
-			let imgURL = '';
-			if (productImage) {
-				// Upload the image to Firebase Storage
-				imgURL = await uploadImageToFirebase(productImage, 'products');
+		await withLoader("Adding product", async () => {
+			try {
+				let imgURL = '';
+				if (productImage) {
+					// Upload the image to Firebase Storage
+					imgURL = await uploadImageToFirebase(productImage, 'products');
+				}
+				const now = new Date().getTime(); // Current timestamp in milliseconds
+
+				// Add the product to Firestore
+				const productId = await addProduct({
+					img: imgURL,
+					product_code: productCode,
+					name: productName,
+					quantity: initialQuantity,
+					updatedAt: now, // Current timestamp in milliseconds
+				});
+
+				// Also add product History for first instance.
+				let history = {
+					action: 'added',
+					quantity: initialQuantity,
+					comment: 'Initial stock',
+					timestamp: now,
+				};
+
+				await addProductHistory(productId, history);
+
+				setSuccess(`Product added successfully with ID: ${productId}`);
+				setError('');
+
+				// Reset form fields
+				setProductCode('');
+				setProductName('');
+				setProductImage(null);
+				setInitialQuantity(0);
+			} catch (err) {
+				setError('Error adding product. Please try again.');
+				setSuccess('');
 			}
-			const now = new Date().getTime(); // Current timestamp in milliseconds
-
-			// Add the product to Firestore
-			const productId = await addProduct({
-				img: imgURL,
-				product_code: productCode,
-				name: productName,
-				quantity: initialQuantity,
-				updatedAt: now, // Current timestamp in milliseconds
-			});
-
-			// Also add product History for first instance.
-			let history = {
-				action: 'added',
-				quantity: initialQuantity,
-				comment: 'Initial stock',
-				timestamp: now,
-			};
-
-			await addProductHistory(productId, history);
-
-			setSuccess(`Product added successfully with ID: ${productId}`);
-			setError('');
-
-			// Reset form fields
-			setProductCode('');
-			setProductName('');
-			setProductImage(null);
-			setInitialQuantity(0);
-		} catch (err) {
-			setError('Error adding product. Please try again.');
-			setSuccess('');
-		}
+		});
 	};
 
 	return (
