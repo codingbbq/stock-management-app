@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { collection, getDocs, doc, getDoc, DocumentData } from 'firebase/firestore';
-import { db } from '@/firebase/config';
+import { db } from '@/third-party/firebase/config';
 import { formatDate } from '@/helper/formatdata';
 
 const History = ({ product }: DocumentData) => {

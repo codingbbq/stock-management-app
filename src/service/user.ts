@@ -1,11 +1,14 @@
 import { collection, query, where, getDocs } from "firebase/firestore";
-import { db } from "@/firebase/config";
+import { db } from "@/third-party/firebase/config";
 import bcrypt from "bcryptjs";
 
 export const authenticateUser = async (username: string, password: string) => {
   try {
 
     const usersCollection = collection(db, "users");
+    const snapshot = await getDocs(usersCollection);
+    const users = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    console.log("Fetched users:", users);
     const q = query(usersCollection, where("username", "==", username));
     const querySnapshot = await getDocs(q);
 

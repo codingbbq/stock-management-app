@@ -27,21 +27,21 @@ const Login: React.FC = () => {
 					<div className='p-6'>
 						<h2 className='text-2xl font-semibold'>Login</h2>
 						<p className='mt-2 text-sm text-gray-600'>
-							Enter your email below to login to your account.
+							Enter your username below to login to your account.
 						</p>
 					</div>
 					<div className='p-6 space-y-4'>
 						<div className='space-y-2'>
 							<label
-								htmlFor='email'
+								htmlFor='username'
 								className='block text-sm font-medium text-gray-700'
 							>
-								Email
+								Username
 							</label>
 							<input
 								id='username'
-								type='email'
-								placeholder='m@example.com'
+								type='text'
+								placeholder='Username'
 								required
 								value={username}
 								onChange={(e) => setUsername(e.target.value)}

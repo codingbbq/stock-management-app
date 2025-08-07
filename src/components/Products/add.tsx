@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { addProduct, addProductHistory } from '@/service/product';
+import { uploadImageToFirebase } from '@/service/uploadImage';
 
 const AddProductForm: React.FC = () => {
 	const [productCode, setProductCode] = useState('');
@@ -19,27 +20,30 @@ const AddProductForm: React.FC = () => {
 		e.preventDefault();
 
 		try {
-			// Convert the image to a URL or base64 string (if needed)
-			const img = productImage ? URL.createObjectURL(productImage) : '';
-            const now = new Date().getTime(); // Current timestamp in milliseconds
+			let imgURL = '';
+			if (productImage) {
+				// Upload the image to Firebase Storage
+				imgURL = await uploadImageToFirebase(productImage, 'products');
+			}
+			const now = new Date().getTime(); // Current timestamp in milliseconds
 
 			// Add the product to Firestore
 			const productId = await addProduct({
-				img,
+				img: imgURL,
 				product_code: productCode,
 				name: productName,
 				quantity: initialQuantity,
 				updatedAt: now, // Current timestamp in milliseconds
 			});
 
-            // Also add product History for first instance.
+			// Also add product History for first instance.
 			let history = {
 				action: 'added',
 				quantity: initialQuantity,
 				comment: 'Initial stock',
 				timestamp: now,
 			};
-			
+
 			await addProductHistory(productId, history);
 
 			setSuccess(`Product added successfully with ID: ${productId}`);
@@ -58,7 +62,6 @@ const AddProductForm: React.FC = () => {
 
 	return (
 		<form onSubmit={handleSubmit} className='p-6 space-y-6 bg-white shadow-md rounded-lg'>
-			
 			{/* Product Code */}
 			<div>
 				<label htmlFor='product-code' className='block mb-2 text-sm font-medium'>

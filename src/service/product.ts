@@ -1,5 +1,5 @@
 import { addDoc, collection, doc, getDocs, updateDoc } from 'firebase/firestore';
-import { db } from '../firebase/config';
+import { db } from '@/third-party/firebase/config';
 
 // Function to get all products
 export const getAllProducts = async () => {
@@ -10,7 +10,6 @@ export const getAllProducts = async () => {
 			id: doc.id, // Include the document ID
 			...doc.data(), // Spread the document data
 		}));
-		console.log('Fetched products:', productsList);
 		return productsList;
 	} catch (error) {
 		console.error('Error fetching all products:', error);
