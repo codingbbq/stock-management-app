@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { addProduct, addProductHistory } from '@/service/product';
-import { uploadImageToFirebase } from '@/service/uploadImage';
+import { uploadImageToFirebase } from '@/service/image';
 import { useWithLoader } from '@/helper/withLoader';
 import imageCompression from 'browser-image-compression';
 

@@ -17,7 +17,7 @@ const Navigation: React.FC = () => {
 								className='mr-3 flex-none w-[2.0625rem] overflow-hidden md:w-auto'
 								to='/'
 							>
-								<span>Stock Management App</span>
+								<span>Modern Printers</span>
 							</Link>
 
 							<div className='relative hidden lg:flex items-center ml-auto'>

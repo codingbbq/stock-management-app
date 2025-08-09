@@ -1,5 +1,6 @@
-import { addDoc, collection, doc, getDocs, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, getDocs, getDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/third-party/firebase/config';
+import { deleteImageFromFirebase } from './image';
 
 // Function to get all products
 export const getAllProducts = async () => {
@@ -76,4 +77,23 @@ export const addProductHistory = async (
 		console.error('Error adding product history:', error);
 		throw error;
 	}
+};
+
+
+export const deleteProduct = async (productId: string) => {
+    try {
+        const productRef = doc(db, 'products', productId);
+        const productSnap = await getDoc(productRef);
+        const imgURL = productSnap.exists() ? productSnap.data().img : null;
+
+        if (imgURL) {
+            await deleteImageFromFirebase(imgURL);
+        }
+
+        await deleteDoc(productRef);
+        console.log(`Product ${productId} deleted successfully.`);
+    } catch (error) {
+        console.error('Error deleting product:', error);
+        throw error;
+    }
 };

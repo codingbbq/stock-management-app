@@ -8,6 +8,7 @@ import History from './history';
 import { formatDate } from '@/helper/formatdata';
 import AddProduct from './add';
 import { useWithLoader } from '@/helper/withLoader';
+import { deleteProduct } from '@/service/product';
 
 const AllProducts = () => {
 	const { isLoggedIn } = useAuth();
@@ -32,6 +33,18 @@ const AllProducts = () => {
 
 	const handleAddProduct = () => {
 		setIsAddModalOpen(true); // Open the modal for adding a new product
+	};
+
+	const handleProductDelete = async (product: DocumentData) => {
+		// Implement product deletion logic here
+		console.log('Delete product:', product);
+		await withLoader('Deleting product', async () => {
+			// Call your delete product service here
+			await deleteProduct(product.id);
+			fetchProducts();
+			console.log(`Product ${product.id} deleted successfully.`);
+		});
+
 	};
 
 	const handleCloseModal = () => {
@@ -63,6 +76,7 @@ const AllProducts = () => {
 
 	return (
 		<>
+			{isLoggedIn && (
 			<div className='block text-right p-6 space-x-3'>
 				<button
 					type='button'
@@ -72,6 +86,7 @@ const AllProducts = () => {
 					Add Product
 				</button>
 			</div>
+			)}
 			<div className='relative overflow-x-auto shadow-md sm:rounded-lg'>
 				<table className='w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400'>
 					<thead className='text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400'>
@@ -156,9 +171,20 @@ const AllProducts = () => {
 												e.preventDefault(); // Prevent default link behavior
 												handleViewHistory(product); // Open the modal
 											}}
-											className='font-medium text-blue-600 dark:text-blue-500 hover:underline'
+											className='mr-2 font-medium text-blue-600 dark:text-blue-500 hover:underline'
 										>
 											History
+										</a>
+
+										<a
+											href='#'
+											onClick={(e) => {
+												e.preventDefault(); // Prevent default link behavior
+												handleProductDelete(product); // Open the modal
+											}}
+											className='font-medium text-red-600 dark:text-red-500 hover:underline'
+										>
+											Delete
 										</a>
 									</td>
 								)}
