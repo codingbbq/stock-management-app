@@ -11,206 +11,166 @@ import { useWithLoader } from '@/helper/withLoader';
 import { deleteProduct } from '@/service/product';
 
 const AllProducts = () => {
-	const { isLoggedIn } = useAuth();
+    const { isLoggedIn } = useAuth();
 
-	const [products, setProducts] = useState<DocumentData[]>([]);
+    const [products, setProducts] = useState<DocumentData[]>([]);
 
-	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-	const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
-	const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-	const [selectedProduct, setSelectedProduct] = useState<DocumentData | null>(null);
-	const withLoader = useWithLoader();
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState<DocumentData | null>(null);
+    const withLoader = useWithLoader();
 
-	const handleEditClick = (product: DocumentData) => {
-		setSelectedProduct(product); // Set the selected product
-		setIsEditModalOpen(true); // Open the modal
-	};
+    const handleEditClick = (product: DocumentData) => {
+        setSelectedProduct(product);
+        setIsEditModalOpen(true);
+    };
 
-	const handleViewHistory = (product: DocumentData) => {
-		setSelectedProduct(product); // Set the selected product
-		setIsHistoryModalOpen(true); // Open the history modal
-	};
+    const handleViewHistory = (product: DocumentData) => {
+        setSelectedProduct(product);
+        setIsHistoryModalOpen(true);
+    };
 
-	const handleAddProduct = () => {
-		setIsAddModalOpen(true); // Open the modal for adding a new product
-	};
+    const handleAddProduct = () => {
+        setIsAddModalOpen(true);
+    };
 
-	const handleProductDelete = async (product: DocumentData) => {
-		// Implement product deletion logic here
-		console.log('Delete product:', product);
-		await withLoader('Deleting product', async () => {
-			// Call your delete product service here
-			await deleteProduct(product.id);
-			fetchProducts();
-			console.log(`Product ${product.id} deleted successfully.`);
-		});
+    const handleProductDelete = async (product: DocumentData) => {
+        await withLoader('Deleting product', async () => {
+            await deleteProduct(product.id);
+            fetchProducts();
+            console.log(`Product ${product.id} deleted successfully.`);
+        });
+    };
 
-	};
+    const handleCloseModal = () => {
+        setIsEditModalOpen(false);
+        setIsHistoryModalOpen(false);
+        setIsAddModalOpen(false);
+        setSelectedProduct(null);
+    };
 
-	const handleCloseModal = () => {
-		setIsEditModalOpen(false); // Close the modal
-		setIsHistoryModalOpen(false); // Close the history modal
-		setIsAddModalOpen(false); // Close the add product modal
-		setSelectedProduct(null); // Clear the selected product
-	};
+    const handleOnSuccess = () => {
+        handleCloseModal();
+        fetchProducts();
+    };
 
-	const handleOnSuccess = () => {
-		handleCloseModal(); // Close the modal after successful operation
-		fetchProducts(); // Refresh the product list
-	};
+    const fetchProducts = async () => {
+        await withLoader('Fetching Product', async () => {
+            try {
+                const productsList = await getAllProducts();
+                setProducts(productsList);
+            } catch (error) {
+                console.error('Error fetching products:', error);
+            }
+        });
+    };
 
-	const fetchProducts = async () => {
-		await withLoader('Fetching Product', async () => {
-			try {
-				const productsList = await getAllProducts();
-				setProducts(productsList);
-			} catch (error) {
-				console.error('Error fetching products:', error);
-			}
-		});
-	};
+    useEffect(() => {
+        fetchProducts();
+    }, []);
 
-	useEffect(() => {
-		fetchProducts();
-	}, []);
+    return (
+        <>
+            {isLoggedIn && (
+                <div className='block text-right p-6 space-x-3'>
+                    <button
+                        type='button'
+                        className='text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
+                        onClick={handleAddProduct}
+                    >
+                        Add Product
+                    </button>
+                </div>
+            )}
+            {/* Desktop: Table look using grid/flex, Mobile: Cards */}
+            <div className="w-full px-4 py-3 my-3 rounded-lg shadow-md">
+                {/* Header row for desktop */}
+                <div className="hidden sm:grid grid-cols-5 bg-gray-100 font-semibold text-gray-700 px-4 py-2 rounded-t-lg">
+                    <div className="col-span-1">Image</div>
+                    <div className="col-span-1">Code</div>
+                    <div className="col-span-1">Name</div>
+                    <div className="col-span-1">Quantity</div>
+                     {isLoggedIn && (<div className="col-span-1">Actions</div>)}
+                </div>
+                <div className="divide-y">
+                    {products.map((product, idx) => (
+                        // Desktop: grid row, Mobile: card
+                        <div
+                            key={product.id || idx}
+                            className="flex flex-col sm:grid sm:grid-cols-5 bg-white items-center px-4 py-3"
+                        >
+                            {/* Image */}
+                            <div className="flex items-center mb-2 sm:mb-0">
+                                <img
+                                    src={product.img || ''}
+                                    alt={product.name}
+                                    className="w-20 h-20 object-cover rounded"
+                                />
+                            </div>
+                            {/* Code */}
+                            <div className="text-gray-900 font-medium mb-1 sm:mb-0 flex items-center">
+                                {product.product_code}
+                            </div>
+                            {/* Name */}
+                            <div className="text-gray-700 mb-1 sm:mb-0 flex items-center">
+                                {product.name}
+                            </div>
+                            {/* Quantity */}
+                            <div className="text-gray-500 mb-1 sm:mb-0 flex items-center">
+                                {product.quantity}
+                            </div>
+                            {/* Actions */}
+                            <div className="flex gap-3">
+                                {isLoggedIn && (
+                                    <>
+                                        <button
+                                            onClick={() => handleEditClick(product)}
+                                            className="text-blue-600 hover:underline text-sm"
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            onClick={() => handleViewHistory(product)}
+                                            className="text-blue-600 hover:underline text-sm"
+                                        >
+                                            History
+                                        </button>
+                                        <button
+                                            onClick={() => handleProductDelete(product)}
+                                            className="text-red-600 hover:underline text-sm"
+                                        >
+                                            Delete
+                                        </button>
+                                    </>
+                                )}
+                            </div>
+                            {/* Mobile: show updated date below */}
+                            <div className="sm:hidden text-xs text-gray-400 mt-2 text-center w-full">
+                                {formatDate(product.updatedAt)}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
 
-	return (
-		<>
-			{isLoggedIn && (
-			<div className='block text-right p-6 space-x-3'>
-				<button
-					type='button'
-					className='text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
-					onClick={handleAddProduct}
-				>
-					Add Product
-				</button>
-			</div>
-			)}
-			<div className='relative overflow-x-auto shadow-md sm:rounded-lg'>
-				<table className='w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400'>
-					<thead className='text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400'>
-						<tr>
-							<th
-								scope='col'
-								className='px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider'
-							>
-								Image
-							</th>
-							<th
-								scope='col'
-								className='px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider'
-							>
-								Product Code
-							</th>
-							<th
-								scope='col'
-								className='px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider'
-							>
-								Product Name
-							</th>
-							<th
-								scope='col'
-								className='px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider'
-							>
-								Stock
-							</th>
-							<th
-								scope='col'
-								className='px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider'
-							>
-								Updated At
-							</th>
-							{isLoggedIn && (
-								<th
-									scope='col'
-									className='px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider'
-								>
-									<span className='sr-only'>Actions</span>
-								</th>
-							)}
-						</tr>
-					</thead>
-					<tbody>
-						{products.map((product, idx) => (
-							<tr
-								key={product.id || idx}
-								className='bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600'
-							>
-								<td className='px-6 py-4'>
-									<img
-										src={product.img || ''}
-										width={100}
-										height={100}
-										alt=''
-										className='rounded'
-									/>
-								</td>
-								<td className='px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white'>
-									{product.product_code}
-								</td>
-								<td className='px-6 py-4'>{product.name}</td>
-								<td className='px-6 py-4'>{product.quantity}</td>
-								<td className='px-6 py-4'>{formatDate(product.updatedAt)}</td>
-								{isLoggedIn && (
-									<td className='px-6 py-4 text-right'>
-										<a
-											href='#'
-											onClick={(e) => {
-												e.preventDefault(); // Prevent default link behavior
-												handleEditClick(product); // Open the modal
-											}}
-											className='mr-2 font-medium text-blue-600 dark:text-blue-500 hover:underline'
-										>
-											Edit
-										</a>
+            <Modal title='Edit Product' isOpen={isEditModalOpen} onClose={handleCloseModal}>
+                <Edit product={selectedProduct} />
+            </Modal>
 
-										<a
-											href='#'
-											onClick={(e) => {
-												e.preventDefault(); // Prevent default link behavior
-												handleViewHistory(product); // Open the modal
-											}}
-											className='mr-2 font-medium text-blue-600 dark:text-blue-500 hover:underline'
-										>
-											History
-										</a>
+            <Modal
+                title={selectedProduct?.name}
+                isOpen={isHistoryModalOpen}
+                onClose={handleCloseModal}
+            >
+                <History product={selectedProduct} />
+            </Modal>
 
-										<a
-											href='#'
-											onClick={(e) => {
-												e.preventDefault(); // Prevent default link behavior
-												handleProductDelete(product); // Open the modal
-											}}
-											className='font-medium text-red-600 dark:text-red-500 hover:underline'
-										>
-											Delete
-										</a>
-									</td>
-								)}
-							</tr>
-						))}
-					</tbody>
-				</table>
-
-				<Modal title='Edit Product' isOpen={isEditModalOpen} onClose={handleCloseModal}>
-					<Edit product={selectedProduct} />
-				</Modal>
-
-				<Modal
-					title={selectedProduct?.name}
-					isOpen={isHistoryModalOpen}
-					onClose={handleCloseModal}
-				>
-					<History product={selectedProduct} />
-				</Modal>
-
-				<Modal title='Add Product' isOpen={isAddModalOpen} onClose={handleCloseModal}>
-					<AddProduct onSuccess={handleOnSuccess} />
-				</Modal>
-			</div>
-		</>
-	);
+            <Modal title='Add Product' isOpen={isAddModalOpen} onClose={handleCloseModal}>
+                <AddProduct onSuccess={handleOnSuccess} />
+            </Modal>
+        </>
+    );
 };
 
 export default AllProducts;

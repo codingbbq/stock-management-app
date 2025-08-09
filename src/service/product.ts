@@ -86,14 +86,24 @@ export const deleteProduct = async (productId: string) => {
         const productSnap = await getDoc(productRef);
         const imgURL = productSnap.exists() ? productSnap.data().img : null;
 
+		// Delete all docs in the 'history' subcollection
+        await deleteSubcollection(`products/${productId}`, 'history');
+
         if (imgURL) {
             await deleteImageFromFirebase(imgURL);
         }
 
         await deleteDoc(productRef);
-        console.log(`Product ${productId} deleted successfully.`);
+        console.log(`Product ${productId} and its history deleted successfully.`);
     } catch (error) {
         console.error('Error deleting product:', error);
         throw error;
     }
+};
+
+const deleteSubcollection = async (parentDocPath: string, subcollectionName: string) => {
+    const subColRef = collection(db, parentDocPath, subcollectionName);
+    const snapshot = await getDocs(subColRef);
+    const batchDeletes = snapshot.docs.map((d) => deleteDoc(d.ref));
+    await Promise.all(batchDeletes);
 };

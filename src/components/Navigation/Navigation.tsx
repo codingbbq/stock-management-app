@@ -14,7 +14,7 @@ const Navigation: React.FC = () => {
 					<div className='py-4 border-b border-slate-900/10 lg:px-8 lg:border-0 dark:border-slate-300/10 px-4'>
 						<div className='relative flex items-center'>
 							<Link
-								className='mr-3 flex-none w-[2.0625rem] overflow-hidden md:w-auto'
+								className='mr-3 flex-none overflow-hidden md:w-auto'
 								to='/'
 							>
 								<span>Modern Printers</span>
