@@ -3,9 +3,8 @@ import { DocumentData } from 'firebase/firestore';
 import { useState } from 'react';
 import { useWithLoader } from '@/helper/withLoader'; // Adjust the import path as necessary
 
-const Edit = ({ product }: DocumentData) => {
+const Edit: React.FC<{ product: DocumentData; onSuccess?: () => void }> = ({ product, onSuccess }) => {
 	console.log('Editing product:', product);
-	const [img, setImg] = useState(product.img || '');
 	const [code, setCode] = useState(product.product_code || '');
 	const [name, setName] = useState(product.name || '');
 	const [quantity, setQuantity] = useState(product.quantity || 0);
@@ -62,6 +61,10 @@ const Edit = ({ product }: DocumentData) => {
 			setAddQuantity(0);
 			setRemoveQuantity(0);
 			setComment('');
+
+			if (onSuccess) {
+				onSuccess();
+			}
 		});
 	};
 

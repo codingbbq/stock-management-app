@@ -13,22 +13,24 @@ const AddProductForm: React.FC<{ onSuccess?: () => void }> = ({ onSuccess }) => 
 	const [success, setSuccess] = useState('');
 	const withLoader = useWithLoader();
 
-	const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-		if (e.target.files && e.target.files[0]) {
-			const file = e.target.files[0];
-			// Compress the image before uploading
-			const options = {
-				maxSizeMB: 0.5, // Maximum size in MB
-				maxWidthOrHeight: 1024, // Maximum width or height in pixels
-				useWebWorker: true, // Use web worker for compression
-			};
-			try {
-				const compressedFile = await imageCompression(file, options);
-				setProductImage(compressedFile);
-			} catch (error) {
-				console.error('Error compressing image:', error);
-				setProductImage(file); // Fallback to original file if compression fails
-			}
+	const handleImgageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+		if (file) {
+			setProductImage(file);
+		}
+	};
+
+	const compressImage = async (file: File) => {
+		const options = {
+			maxSizeMB: 0.5,
+			maxWidthOrHeight: 1024,
+			useWebWorker: true,
+		};
+		try {
+			return await imageCompression(file, options);
+		} catch (error) {
+			console.error('Error compressing image:', error);
+			return file; // Fallback to original file if compression fails
 		}
 	};
 
@@ -39,8 +41,8 @@ const AddProductForm: React.FC<{ onSuccess?: () => void }> = ({ onSuccess }) => 
 			try {
 				let imgURL = '';
 				if (productImage) {
-					// Upload the image to Firebase Storage
-					imgURL = await uploadImageToFirebase(productImage, 'products');
+					const compressedFile = await compressImage(productImage);
+					imgURL = await uploadImageToFirebase(compressedFile, 'products');
 				}
 				const now = new Date().getTime(); // Current timestamp in milliseconds
 
@@ -123,7 +125,7 @@ const AddProductForm: React.FC<{ onSuccess?: () => void }> = ({ onSuccess }) => 
 					type='file'
 					id='product-image'
 					accept='image/*'
-					onChange={handleImageUpload}
+					onChange={handleImgageChange}
 					className='block w-full text-sm text-gray-900 border rounded-lg cursor-pointer'
 				/>
 			</div>

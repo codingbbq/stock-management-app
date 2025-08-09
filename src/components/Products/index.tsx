@@ -154,7 +154,9 @@ const AllProducts = () => {
 			</div>
 
 			<Modal title='Edit Product' isOpen={isEditModalOpen} onClose={handleCloseModal}>
-				<Edit product={selectedProduct} />
+				{selectedProduct && (
+					<Edit product={selectedProduct} onSuccess={handleOnSuccess} />
+				)}
 			</Modal>
 
 			<Modal
