@@ -7,7 +7,7 @@ const Edit: React.FC<{ product: DocumentData; onSuccess?: () => void }> = ({ pro
 	console.log('Editing product:', product);
 	const [code, setCode] = useState(product.product_code || '');
 	const [name, setName] = useState(product.name || '');
-	const [quantity, setQuantity] = useState(product.quantity || 0);
+	const [quantity] = useState(product.quantity || 0);
 	const [addQuantity, setAddQuantity] = useState(0);
 	const [removeQuantity, setRemoveQuantity] = useState(0);
 	const [comment, setComment] = useState('');
