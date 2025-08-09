@@ -19,6 +19,8 @@ const AllProducts = () => {
 	const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
 	const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 	const [selectedProduct, setSelectedProduct] = useState<DocumentData | null>(null);
+	const [searchTerm, setSearchTerm] = useState('');
+
 	const withLoader = useWithLoader();
 
 	const handleEditClick = (product: DocumentData) => {
@@ -70,19 +72,37 @@ const AllProducts = () => {
 		fetchProducts();
 	}, []);
 
+	// 2. Filter products based on search term (case-insensitive)
+	const filteredProducts = products.filter(
+		(product) =>
+			(product.product_code?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+			(product.name?.toLowerCase() || '').includes(searchTerm.toLowerCase())
+	);
+
 	return (
 		<>
-			{isLoggedIn && (
-				<div className='hidden sm:block text-right p-6 space-x-3'>
+			<div className='w-full flex items-center justify-between gap-3 mb-4'>
+				<input
+					id='search'
+					type='text'
+					placeholder='Search by code or name...'
+					className={`px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-200 transition-all duration-200
+            		${isLoggedIn ? 'w-full sm:w-2/3' : 'w-full'}`}
+					value={searchTerm}
+					onChange={(e) => setSearchTerm(e.target.value)}
+				/>
+				{isLoggedIn && (
 					<button
 						type='button'
-						className='text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
+						className='hidden sm:block ml-2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-2 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
 						onClick={handleAddProduct}
+						style={{ height: '40px' }} // Optional: force consistent height
 					>
 						Add Product
 					</button>
-				</div>
-			)}
+				)}
+			</div>
+
 			{/* Desktop: Table look using grid/flex, Mobile: Cards */}
 			<div className='w-full px-4 py-3 my-3 rounded-lg shadow-md'>
 				{/* Header row for desktop */}
@@ -95,7 +115,7 @@ const AllProducts = () => {
 					{isLoggedIn && <div className='col-span-1'>Actions</div>}
 				</div>
 				<div className='divide-y divide-gray-200'>
-					{products.map((product, idx) => (
+					{filteredProducts.map((product, idx) => (
 						// Desktop: grid row, Mobile: card
 						<div
 							key={product.id || idx}
@@ -154,9 +174,7 @@ const AllProducts = () => {
 			</div>
 
 			<Modal title='Edit Product' isOpen={isEditModalOpen} onClose={handleCloseModal}>
-				{selectedProduct && (
-					<Edit product={selectedProduct} onSuccess={handleOnSuccess} />
-				)}
+				{selectedProduct && <Edit product={selectedProduct} onSuccess={handleOnSuccess} />}
 			</Modal>
 
 			<Modal
