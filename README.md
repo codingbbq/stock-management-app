@@ -19,16 +19,16 @@ Login Page
 ![Login Page](screenshots/Login%20page.png)
 
 Add Product Page
-![Add Product Page](screenshots/Add%20product.png)
+![Add Product Page](screenshots/Add%20Product.png)
 
 Edit Product Page
-![Edit Product Page](screenshots/Edit%20product.png)
+![Edit Product Page](screenshots/Edit%20Product.png)
 
 Product Listing Page
-![Product Listing Page](screenshots/Product%20listing.png)
+![Product Listing Page](screenshots/Product%20Listing.png)
 
 View History Page
-![View History Page](screenshots/View%20history.png)
+![View History Page](screenshots/view%20history.png)
 
 
 
